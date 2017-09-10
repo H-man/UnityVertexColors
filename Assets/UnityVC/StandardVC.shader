@@ -1,6 +1,6 @@
 ﻿/*
-Unity Standard Vertex Color Shader v0.92 (for Unity 5.4.0)
-by defaxer
+Unity Standard Vertex Color Shader for Unity 2017.1.1f1
+(original by defaxer)
 */
 
 Shader "Standard (Vertex Color)" {

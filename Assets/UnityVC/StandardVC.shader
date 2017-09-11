@@ -90,11 +90,12 @@ Shader "Standard (Vertex Color)" {
 
 			#pragma multi_compile_fwdbase
 			#pragma multi_compile_fog
+			#pragma multi_compile_instancing
 
 			#pragma vertex vertForwardBase_VC
 			#pragma fragment fragForwardBase_VC
 
-			#include "UnityStandardCore.cginc"
+			#include "UnityStandardCoreForward.cginc"
 			#include "UnityVC.cginc"
 
 			ENDCG
@@ -130,7 +131,7 @@ Shader "Standard (Vertex Color)" {
 			#pragma vertex vertForwardAdd_VC
 			#pragma fragment fragForwardAdd_VC
 
-			#include "UnityStandardCore.cginc"
+			#include "UnityStandardCoreForward.cginc"
 			#include "UnityVC.cginc"
 			ENDCG
 		}
@@ -152,6 +153,7 @@ Shader "Standard (Vertex Color)" {
 			#pragma shader_feature _VERTEXCOLOR_LERP
 			#pragma shader_feature _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
 			#pragma multi_compile_shadowcaster
+ 			#pragma multi_compile_instancing
 
 			#pragma vertex vertShadowCaster_VC
 			#pragma fragment fragShadowCaster_VC
@@ -188,6 +190,8 @@ Shader "Standard (Vertex Color)" {
 			#pragma multi_compile LIGHTMAP_OFF LIGHTMAP_ON
 			#pragma multi_compile ___ DIRLIGHTMAP_COMBINED DIRLIGHTMAP_SEPARATE
 			#pragma multi_compile DYNAMICLIGHTMAP_OFF DYNAMICLIGHTMAP_ON
+
+      #pragma multi_compile_instancing
 
 			#pragma vertex vertDeferred_VC
 			#pragma fragment fragDeferred_VC
@@ -252,7 +256,7 @@ Shader "Standard (Vertex Color)" {
 			// SM2.0: NOT SUPPORTED shader_feature ___ _DETAIL_MULX2
 			// SM2.0: NOT SUPPORTED shader_feature _PARALLAXMAP
 
-			#pragma skip_variants SHADOWS_SOFT DIRLIGHTMAP_COMBINED DIRLIGHTMAP_SEPARATE
+			 #pragma skip_variants SHADOWS_SOFT DIRLIGHTMAP_COMBINED
 
 			#pragma multi_compile_fwdbase
 			#pragma multi_compile_fog
@@ -260,7 +264,7 @@ Shader "Standard (Vertex Color)" {
 			#pragma vertex vertForwardBase_VC
 			#pragma fragment fragForwardBase_VC
 
-			#include "UnityStandardCore.cginc"
+			#include "UnityStandardCoreForward.cginc"
 			#include "UnityVC.cginc"
 
 			ENDCG
@@ -295,7 +299,7 @@ Shader "Standard (Vertex Color)" {
 			#pragma vertex vertForwardAdd_VC
 			#pragma fragment fragForwardAdd_VC
 
-			#include "UnityStandardCore.cginc"
+			#include "UnityStandardCoreForward.cginc"
 			#include "UnityVC.cginc"
 			ENDCG
 		}

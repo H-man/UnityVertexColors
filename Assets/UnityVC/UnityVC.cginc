@@ -25,6 +25,7 @@ struct VertexInput_VC
 #ifdef _TANGENT_TO_WORLD
 	half4 tangent	: TANGENT;
 #endif
+	UNITY_VERTEX_INPUT_INSTANCE_ID
 };
 
 float4 TexCoords_VC(VertexInput_VC v)
@@ -47,9 +48,9 @@ inline half4 VertexGIForward_VC(VertexInput_VC v, float3 posWorld, half3 normalW
 #ifdef VERTEXLIGHT_ON
 	// Approximated illumination from non-important point lights
 	ambientOrLightmapUV.rgb = Shade4PointLights(
-		unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
-		unity_LightColor[0].rgb, unity_LightColor[1].rgb, unity_LightColor[2].rgb, unity_LightColor[3].rgb,
-		unity_4LightAtten0, posWorld, normalWorld);
+	unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
+	unity_LightColor[0].rgb, unity_LightColor[1].rgb, unity_LightColor[2].rgb, unity_LightColor[3].rgb,
+	unity_4LightAtten0, posWorld, normalWorld);
 #endif
 
 	ambientOrLightmapUV.rgb = ShadeSHPerVertex(normalWorld, ambientOrLightmapUV.rgb);
@@ -71,9 +72,9 @@ struct VertexOutputForwardBase_VC
 	half4 tangentToWorldAndPackedData[3]	: TEXCOORD2;	// [3x3:tangentToWorld | 1x3:viewDirForParallax]
 	half4 ambientOrLightmapUV			: TEXCOORD5;	// SH or Lightmap UV
 	SHADOW_COORDS(6)
-		UNITY_FOG_COORDS(7)
+	UNITY_FOG_COORDS(7)
 #if defined(_VERTEXCOLOR) || defined(_VERTEXCOLOR_LERP)
-		fixed4 color : COLOR;
+	fixed4 color : COLOR;
 #endif
 	// next ones would not fit into SM2.0 limits, but they are always for SM3.0+
 #if UNITY_SPECCUBE_BOX_PROJECTION || UNITY_LIGHT_PROBE_PROXY_VOLUME
@@ -81,13 +82,14 @@ struct VertexOutputForwardBase_VC
 #endif
 
 #if UNITY_OPTIMIZE_TEXCUBELOD
-#if UNITY_SPECCUBE_BOX_PROJECTION
-	half3 reflUVW				: TEXCOORD9;
-#else
-	half3 reflUVW				: TEXCOORD8;
-#endif
+	#if UNITY_SPECCUBE_BOX_PROJECTION
+		half3 reflUVW				: TEXCOORD9;
+	#else
+		half3 reflUVW				: TEXCOORD8;
+	#endif
 #endif
 
+	UNITY_VERTEX_INPUT_INSTANCE_ID
 	UNITY_VERTEX_OUTPUT_STEREO
 };
 
@@ -96,6 +98,7 @@ VertexOutputForwardBase_VC vertForwardBase_VC(VertexInput_VC v)
 	UNITY_SETUP_INSTANCE_ID(v);
 	VertexOutputForwardBase_VC o;
 	UNITY_INITIALIZE_OUTPUT(VertexOutputForwardBase_VC, o);
+	UNITY_TRANSFER_INSTANCE_ID(v, o);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
 	float4 posWorld = mul(unity_ObjectToWorld, v.vertex);
@@ -151,31 +154,31 @@ half4 fragForwardBase_VC(VertexOutputForwardBase_VC i) : SV_Target
 	s.reflUVW = i.reflUVW;
 #endif
 
-UnityLight mainLight = MainLight();// (s.normalWorld);
-half atten = SHADOW_ATTENUATION(i);
+	UnityLight mainLight = MainLight();// (s.normalWorld);
+	half atten = SHADOW_ATTENUATION(i);
 
-half occlusion = Occlusion(i.tex.xy);
-UnityGI gi = FragmentGI(s, occlusion, i.ambientOrLightmapUV, atten, mainLight);
+	half occlusion = Occlusion(i.tex.xy);
+	UnityGI gi = FragmentGI(s, occlusion, i.ambientOrLightmapUV, atten, mainLight);
 
-half4 c = UNITY_BRDF_PBS(s.diffColor, s.specColor, s.oneMinusReflectivity, s.smoothness, s.normalWorld, -s.eyeVec, gi.light, gi.indirect);
+	half4 c = UNITY_BRDF_PBS(s.diffColor, s.specColor, s.oneMinusReflectivity, s.smoothness, s.normalWorld, -s.eyeVec, gi.light, gi.indirect);
 #if _VERTEXCOLOR
-c *= i.color * _IntensityVC;
+	c *= i.color * _IntensityVC;
 #endif
 #if _VERTEXCOLOR_LERP
-c *= lerp(half4(1,1,1,1), i.color, _IntensityVC);
+	c *= lerp(half4(1,1,1,1), i.color, _IntensityVC);
 #endif
-c.rgb += UNITY_BRDF_GI(s.diffColor, s.specColor, s.oneMinusReflectivity, s.smoothness, s.normalWorld, -s.eyeVec, occlusion, gi);
-c.rgb += Emission(i.tex.xy); //i.color.a * s.diffColor;
+	c.rgb += UNITY_BRDF_GI(s.diffColor, s.specColor, s.oneMinusReflectivity, s.smoothness, s.normalWorld, -s.eyeVec, occlusion, gi);
+	c.rgb += Emission(i.tex.xy); //i.color.a * s.diffColor;
 
-UNITY_APPLY_FOG(i.fogCoord, c.rgb);
+	UNITY_APPLY_FOG(i.fogCoord, c.rgb);
 #if _VERTEXCOLOR
-s.alpha *= i.color.a;
+	s.alpha *= i.color.a;
 #endif
 #if _VERTEXCOLOR_LERP
-s.alpha *= lerp(1, i.color.a, _IntensityVC);
+	s.alpha *= lerp(1, i.color.a, _IntensityVC);
 #endif
 
-return OutputForward(c, s.alpha);
+	return OutputForward(c, s.alpha);
 }
 
 //  Additive forward pass (one light per pass)
@@ -186,14 +189,13 @@ struct VertexOutputForwardAdd_VC
 	half3 eyeVec 						: TEXCOORD1;
 	half4 tangentToWorldAndLightDir[3]	: TEXCOORD2;	// [3x3:tangentToWorld | 1x3:lightDir]
 	LIGHTING_COORDS(5, 6)
-		UNITY_FOG_COORDS(7)
+	UNITY_FOG_COORDS(7)
 
 		// next ones would not fit into SM2.0 limits, but they are always for SM3.0+
 #if defined(_PARALLAXMAP)
-		half3 viewDirForParallax			: TEXCOORD8;
+	half3 viewDirForParallax			: TEXCOORD8;
 #endif
 	fixed4 color : COLOR;
-
 	float4 posWorld : TEXCOORD8;
 
 	UNITY_VERTEX_OUTPUT_STEREO
@@ -201,6 +203,7 @@ struct VertexOutputForwardAdd_VC
 
 VertexOutputForwardAdd_VC vertForwardAdd_VC(VertexInput_VC v)
 {
+	UNITY_SETUP_INSTANCE_ID(v);
 	VertexOutputForwardAdd_VC o;
 	UNITY_INITIALIZE_OUTPUT(VertexOutputForwardAdd_VC, o);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
@@ -252,13 +255,13 @@ half4 fragForwardAdd_VC(VertexOutputForwardAdd_VC i) : SV_Target
 	FRAGMENT_SETUP_FWDADD(s)
 
 	UnityLight light = AdditiveLight(IN_LIGHTDIR_FWDADD(i), LIGHT_ATTENUATION(i));
-UnityIndirect noIndirect = ZeroIndirect();
+	UnityIndirect noIndirect = ZeroIndirect();
 
-half4 c = UNITY_BRDF_PBS(s.diffColor, s.specColor, s.oneMinusReflectivity, s.smoothness, s.normalWorld, -s.eyeVec, light, noIndirect);
-c *= i.color;
+	half4 c = UNITY_BRDF_PBS(s.diffColor, s.specColor, s.oneMinusReflectivity, s.smoothness, s.normalWorld, -s.eyeVec, light, noIndirect);
+	c *= i.color;
 
-UNITY_APPLY_FOG_COLOR(i.fogCoord, c.rgb, half4(0,0,0,0)); // fog towards black in additive pass
-return OutputForward(c, s.alpha);
+	UNITY_APPLY_FOG_COLOR(i.fogCoord, c.rgb, half4(0,0,0,0)); // fog towards black in additive pass
+	return OutputForward(c, s.alpha);
 }
 
 //Deferred Pass

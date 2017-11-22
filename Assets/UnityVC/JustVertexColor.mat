@@ -8,7 +8,7 @@ Material:
   m_PrefabInternal: {fileID: 0}
   m_Name: JustVertexColor
   m_Shader: {fileID: 4800000, guid: 21d31f01a531bf5439071462f69c0830, type: 3}
-  m_ShaderKeywords: _EMISSION _VERTEXCOLOR_LERP
+  m_ShaderKeywords: _EMISSION _VERTEXCOLOR
   m_LightmapFlags: 1
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -63,7 +63,8 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _IntensityVC: 0.94
+    - _IntensityVC: 1
+    - _LinearColorSpace: 0
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1

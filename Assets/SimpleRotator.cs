@@ -10,6 +10,6 @@ public class SimpleRotator : MonoBehaviour
 
   void Update()
   {
-    transform.RotateAround(transform.position, Speed, 10);
+    transform.RotateAround(transform.position, Speed, 10 * Time.deltaTime);
   }
 }

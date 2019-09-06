@@ -69,7 +69,7 @@ struct VertexOutputForwardBase_VC
 	float4 pos							: SV_POSITION;
 	float4 tex							: TEXCOORD0;
 	half3 eyeVec 						: TEXCOORD1;
-	half4 tangentToWorldAndPackedData[3]	: TEXCOORD2;	// [3x3:tangentToWorld | 1x3:viewDirForParallax]
+	float4 tangentToWorldAndPackedData[3]	: TEXCOORD2;	// [3x3:tangentToWorld | 1x3:viewDirForParallax]
 	half4 ambientOrLightmapUV			: TEXCOORD5;	// SH or Lightmap UV
 	SHADOW_COORDS(6)
 	UNITY_FOG_COORDS(7)
@@ -114,10 +114,10 @@ VertexOutputForwardBase_VC vertForwardBase_VC(VertexInput_VC v)
 	float4 tangentWorld = float4(UnityObjectToWorldDir(v.tangent.xyz), v.tangent.w);
 
 	float3x3 tangentToWorld = CreateTangentToWorldPerVertex(normalWorld, tangentWorld.xyz, tangentWorld.w);
-	o.tangentToWorldAndPackedData[0].xyz = tangentToWorld[0];
-	o.tangentToWorldAndPackedData[1].xyz = tangentToWorld[1];
-	o.tangentToWorldAndPackedData[2].xyz = tangentToWorld[2];
-#else
+	o.tangentToWorldAndPackedData[0].xyz = tangentToWorld[0].xyz;
+	o.tangentToWorldAndPackedData[1].xyz = tangentToWorld[1].xyz;
+	o.tangentToWorldAndPackedData[2].xyz = tangentToWorld[2].xyz;
+#else 
 	o.tangentToWorldAndPackedData[0].xyz = 0;
 	o.tangentToWorldAndPackedData[1].xyz = 0;
 	o.tangentToWorldAndPackedData[2].xyz = normalWorld;
@@ -187,7 +187,7 @@ struct VertexOutputForwardAdd_VC
 	float4 pos							: SV_POSITION;
 	float4 tex							: TEXCOORD0;
 	half3 eyeVec 						: TEXCOORD1;
-	half4 tangentToWorldAndLightDir[3]	: TEXCOORD2;	// [3x3:tangentToWorld | 1x3:lightDir]
+	float4 tangentToWorldAndLightDir[3]	: TEXCOORD2;	// [3x3:tangentToWorld | 1x3:lightDir]
 	LIGHTING_COORDS(5, 6)
 	UNITY_FOG_COORDS(7)
 
@@ -270,7 +270,7 @@ struct VertexOutputDeferred_VC
 	float4 pos							: SV_POSITION;
 	float4 tex							: TEXCOORD0;
 	half3 eyeVec 						: TEXCOORD1;
-	half4 tangentToWorldAndPackedData[3]	: TEXCOORD2;	// [3x3:tangentToWorld | 1x3:viewDirForParallax]
+	float4 tangentToWorldAndPackedData[3]	: TEXCOORD2;	// [3x3:tangentToWorld | 1x3:viewDirForParallax]
 	half4 ambientOrLightmapUV			: TEXCOORD5;	// SH or Lightmap UVs			
 
 #if defined(_VERTEXCOLOR) || defined(_VERTEXCOLOR_LERP)
@@ -312,9 +312,9 @@ VertexOutputDeferred_VC vertDeferred_VC(VertexInput_VC v)
 	float4 tangentWorld = float4(UnityObjectToWorldDir(v.tangent.xyz), v.tangent.w);
 
 	float3x3 tangentToWorld = CreateTangentToWorldPerVertex(normalWorld, tangentWorld.xyz, tangentWorld.w);
-	o.tangentToWorldAndPackedData[0].xyz = tangentToWorld[0];
-	o.tangentToWorldAndPackedData[1].xyz = tangentToWorld[1];
-	o.tangentToWorldAndPackedData[2].xyz = tangentToWorld[2];
+	o.tangentToWorldAndPackedData[0].xyz = tangentToWorld[0].xyz;
+	o.tangentToWorldAndPackedData[1].xyz = tangentToWorld[1].xyz;
+	o.tangentToWorldAndPackedData[2].xyz = tangentToWorld[2].xyz;
 #else
 	o.tangentToWorldAndPackedData[0].xyz = 0;
 	o.tangentToWorldAndPackedData[1].xyz = 0;
